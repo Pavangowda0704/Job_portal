@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { getMyJobs, deleteJob } from '../api/index.js'
 import { useNavigate } from 'react-router-dom'
-import { getUserJobs, deleteJob } from '../api'
+
 
 function DashboardPage() {
   const { user } = useAuth()
