@@ -5,7 +5,8 @@ import {
   createJob,
   updateJob,
   deleteJob,
-  applyToJob
+  applyToJob,
+  getMyJobs
 } from '../controllers/jobController.js'
 import { protect, restrictTo } from '../middleware/authMiddleware.js'
 
@@ -14,6 +15,8 @@ const router = express.Router()
 // ── Public routes (no login needed) ──────────────
 router.get('/',    getAllJobs)    // anyone can browse jobs
 router.get('/:id', getJobById)   // anyone can view a job
+
+router.get('/user/my-jobs', protect, getMyJobs)
 
 // ── Protected routes (login required) ────────────
 router.post(

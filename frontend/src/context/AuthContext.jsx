@@ -1,23 +1,18 @@
 import { createContext, useContext, useState, useEffect } from 'react'
-import { getMe } from '../api/index.js'
+import { getMe } from '../api'
 
-// 1. Create the context
 const AuthContext = createContext()
 
-// 2. Create the Provider — wraps the whole app
 export function AuthProvider({ children }) {
   const [user,    setUser]    = useState(null)
   const [loading, setLoading] = useState(true)
 
-  // On app load — check if user is already logged in
   useEffect(() => {
     const token = localStorage.getItem('token')
     if (token) {
-      // Verify token with backend and get fresh user data
       getMe()
         .then(({ data }) => setUser(data))
         .catch(() => {
-          // Token expired or invalid — clear it
           localStorage.removeItem('token')
           localStorage.removeItem('user')
         })
@@ -27,14 +22,12 @@ export function AuthProvider({ children }) {
     }
   }, [])
 
-  // Login — save token and user
   const login = (token, userData) => {
     localStorage.setItem('token', token)
-    localStorage.setItem('user',  JSON.stringify(userData))
+    localStorage.setItem('user', JSON.stringify(userData))
     setUser(userData)
   }
 
-  // Logout — clear everything
   const logout = () => {
     localStorage.removeItem('token')
     localStorage.removeItem('user')
@@ -43,12 +36,15 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider value={{ user, loading, login, logout }}>
-      {children}
+      {children}  {/* ← removed !loading check, ProtectedRoute handles it */}
     </AuthContext.Provider>
   )
 }
 
-// 3. Custom hook — easy way to use auth in any component
 export function useAuth() {
-  return useContext(AuthContext)
+  const context = useContext(AuthContext)
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider')
+  }
+  return context
 }

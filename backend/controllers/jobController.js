@@ -196,3 +196,41 @@ export const applyToJob = async (req, res) => {
     res.status(500).json({ error: error.message })
   }
 }
+// Get all applicants for a specific job (Employer only)
+export const getJobApplicants = async (req, res) => {
+  try {
+    const job = await Job.findById(req.params.id)
+      .populate('applicants', 'name email') // This pulls name/email from User model
+    
+    if (!job) return res.status(404).json({ error: 'Job not found' });
+    
+    // Check if the person asking is the one who posted the job
+    if (job.postedBy.toString() !== req.user._id.toString()) {
+      return res.status(401).json({ error: 'Not authorized' });
+    }
+
+    res.json(job.applicants);
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+// ─────────────────────────────────────────
+// @desc    Get jobs posted by logged-in user
+// @route   GET /api/jobs/user/my-jobs
+// @access  Private (employers only)
+// ─────────────────────────────────────────
+export const getMyJobs = async (req, res) => {
+  try {
+    const jobs = await Job.find({ postedBy: req.user._id })
+      .populate('applicants', 'name email')
+      .sort({ createdAt: -1 })
+
+    res.json({
+      count: jobs.length,
+      jobs
+    })
+
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+}

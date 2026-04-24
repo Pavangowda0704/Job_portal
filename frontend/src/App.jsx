@@ -1,39 +1,29 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import HomePage      from './pages/HomePage.jsx'
-import LoginPage     from './pages/LoginPage.jsx'
-import RegisterPage  from './pages/RegisterPage.jsx'
-import JobDetailPage from './pages/JobDetailPage.jsx'
-import DashboardPage from './pages/DashboardPage.jsx'
-import PostJobPage   from './pages/PostJobPage.jsx'
-import Navbar        from './components/Navbar.jsx'
-import ProtectedRoute from './components/ProtectedRoute.jsx'
+import { Routes, Route } from 'react-router-dom'
+import Navbar from './components/Navbar'
+import ProtectedRoute from './components/ProtectedRoute'
+import HomePage from './pages/HomePage'
+import LoginPage from './pages/LoginPage'
+import RegisterPage from './pages/RegisterPage'
+import DashboardPage from './pages/DashboardPage'
+import PostJobPage from './pages/PostJobPage'
+import JobDetailPage from './pages/JobDetailPage'
 
 function App() {
   return (
-    <BrowserRouter>
-      <Navbar />
+    <>
+      <Navbar /> {/* ✅ Now Navbar is safely inside the Router context from main.jsx */}
       <Routes>
-        {/* Public */}
-        <Route path="/"         element={<HomePage />}     />
-        <Route path="/login"    element={<LoginPage />}    />
+        <Route path="/" element={<HomePage />} />
+        <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        <Route path="/jobs/:id" element={<JobDetailPage />}/>
+        <Route path="/jobs/:id" element={<JobDetailPage />} />
 
-        {/* Protected — login required */}
-        <Route path="/dashboard" element={
-          <ProtectedRoute>
-            <DashboardPage />
-          </ProtectedRoute>
-        }/>
-
-        {/* Protected — employers only */}
-        <Route path="/post-job" element={
-          <ProtectedRoute employerOnly>
-            <PostJobPage />
-          </ProtectedRoute>
-        }/>
+        <Route element={<ProtectedRoute />}>
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/post-job" element={<PostJobPage />} />
+        </Route>
       </Routes>
-    </BrowserRouter>
+    </>
   )
 }
 
